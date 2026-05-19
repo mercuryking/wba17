@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="choose_delivery_carrier_purchase_view_form" model="ir.ui.view">
+        <field name="name">choose.delivery.carrier.purchase.form</field>
+        <field name="model">choose.delivery.carrier.purchase</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="available_carrier_ids" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="carrier_id" domain="[('id', 'in', available_carrier_ids)]"/>
+                        <field name="delivery_type" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="order_id" invisible="1"/>
+                        <field name="delivery_price" invisible="1"/>
+                        <label for="display_price"/>
+                        <div class="o_row">
+                            <field name="display_price" widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   invisible="not carrier_id"/>
+                        </div>
+                    </group>
+                </group>
+                <div role="alert" class="alert alert-info"
+                     invisible="not delivery_message">
+                    <field name="delivery_message" nolabel="1"/>
+                </div>
+                <footer>
+                    <button name="button_confirm"
+                            invisible="not context.get('carrier_recompute')"
+                            type="object" string="Update"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button name="button_confirm"
+                            invisible="context.get('carrier_recompute')"
+                            type="object" string="Add"
+                            class="btn-primary" data-hotkey="q"/>
+                    <button string="Discard" special="cancel"
+                            data-hotkey="x" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

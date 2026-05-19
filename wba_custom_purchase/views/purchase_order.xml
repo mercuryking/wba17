@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="purchase_order_view_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.view.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <div name="reminder" position="after">
+                <field name="discount_global_percentage" invisible="not discount_global_percentage" readonly="1" />
+                <field name="delivery_set" invisible="1"/>
+            </div>
+            <xpath expr="//header" position="inside">
+                <button string="Discount"
+                                    name="action_open_discount_wizard"
+                                    type="object"
+                                    invisible="state == 'cancel'"
+                                    class="btn btn-secondary"
+                                    />
+                <button string="Add shipping"
+                                    name="action_open_delivery_wizard"
+                                    type="object"
+                                    invisible="state in ('cancel', 'done') or not order_line or delivery_set"
+                                    class="btn btn-secondary"
+                                    />
+            </xpath>
+
+            <field name="date_order" position="after">
+                <field name="category_id" required="1" invisible="id" readonly="state not in ('draft', 'sent')" options="{'no_create': True, 'no_open': True}"/>
+            </field>
+            
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position="after">
+                <field name="price_subtotal_without_discount_global" string="Tax Excl." />
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_total']" position="after">
+                <field name="price_total_without_discount_global" string="Tax incl."  column_invisible="parent.tax_calculation_rounding_method == 'round_globally'" optional="hide" />
+            </xpath>
+            
+            <xpath expr="//field[@name='order_line']//kanban//field[@name='price_subtotal']" position="after">
+                <field name="price_subtotal_without_discount_global" string="Tax Excl." />
+            </xpath>
+            <xpath expr="//field[@name='order_line']//kanban//field[@name='price_total']" position="after">
+                <field name="price_total_without_discount_global" string="Tax incl."  column_invisible="parent.tax_calculation_rounding_method == 'round_globally'" optional="hide" />
+            </xpath>
+
+
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_total']" position="attributes">
+                 <attribute name="column_invisible">1</attribute>
+            </xpath>
+         
+            <xpath expr="//field[@name='order_line']//kanban//field[@name='price_subtotal']" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//kanban//field[@name='price_total']" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <field name="tax_totals" position="before">
+                <field name="amount_total_before_discount_global" invisible="not discount_global_amount"/>
+                <field name="discount_global_amount" string="Discount Global" invisible="not discount_global_amount"/>
+                
+            </field>
+
+            <field name="fiscal_position_id" position="after">
+                <field name="disetujui_oleh"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

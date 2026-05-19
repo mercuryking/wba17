@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cost_recalc_wizard_form" model="ir.ui.view">
+        <field name="name">valuation.cost.recalc.wizard.form</field>
+        <field name="model">valuation.cost.recalc.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Recalculate Cost">
+                <group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="journal_id"/>
+                    </group>
+                    <group>
+                        <field name="counterpart_account_id"/>
+                        <field name="reason"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="Products" name="products">
+                        <field name="product_ids">
+                            <tree>
+                                <field name="display_name"/>
+                                <field name="standard_price" string="Current Cost"/>
+                                <field name="qty_available" string="On Hand"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_recalculate" string="Run Simulation &amp; Adjust" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cost_recalc_wizard_product" model="ir.actions.act_window">
+        <field name="name">Recalculate Cost</field>
+        <field name="res_model">valuation.cost.recalc.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="product.model_product_product"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <record id="action_cost_recalc_wizard_svl" model="ir.actions.act_window">
+        <field name="name">Recalculate Cost</field>
+        <field name="res_model">valuation.cost.recalc.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="stock_account.model_stock_valuation_layer"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>

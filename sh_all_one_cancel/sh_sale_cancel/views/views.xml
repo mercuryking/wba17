@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_order_inherit_form_view" model="ir.ui.view">
+        <field name="name">sale.order.inherit.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <button name="action_cancel" position="replace">
+                <button groups="sh_all_one_cancel.group_sh_sale_cancel" invisible="state == 'cancel'" name="sh_cancel" string="Cancel" type="object"/>
+            </button>
+            <group name="order_details" position="inside">
+                <field name="cancel_reason" readonly="1" invisible="cancel_reason == False or state != 'cancel'"/>
+            </group>
+        </field>
+    </record>
+</odoo>

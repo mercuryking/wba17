@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_valuation_cleanup_wizard_form" model="ir.ui.view">
+        <field name="name">valuation.cleanup.wizard.form</field>
+        <field name="model">valuation.cleanup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Valuation Cleanup">
+                <group>
+                    <field name="journal_id"/>
+                    <field name="date"/>
+                    <field name="account_id"/>
+                </group>
+                <notebook>
+                    <page string="Products to Cleanup">
+                        <field name="line_ids">
+                            <tree editable="bottom" create="false">
+                                <field name="product_id"/>
+                                <field name="current_value"/>
+                                <field name="fix"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_scan" string="Scan" type="object" class="btn-secondary"/>
+                    <button name="action_apply" string="Apply Cleanup" type="object" class="btn-primary" 
+                            confirm="Are you sure you want to generate corrective valuation layers and journal entries?"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_valuation_cleanup_wizard" model="ir.actions.act_window">
+        <field name="name">Valuation Cleanup</field>
+        <field name="res_model">valuation.cleanup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_a4_quotation" model="report.paperformat">
+        <field name="name">Paperformat A4 Quotation</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="orientation">Portrait</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field> 
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_quotation_order" model="ir.actions.report">
+        <field name="name">Quotation Order</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">wba_custom_sales.quotation_order_report</field>
+        <field name="report_file">wba_custom_sales.quotation_order_report</field>
+        <field name="paperformat_id" ref="paperformat_a4_quotation"/>
+        <field name="print_report_name">('Quotation Order - %s' % (object.name))</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="quotation_order_report">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="header">
+                    <div class="row">
+                        <div class="col-3" style="text-align:left;">
+                            <img t-att-src="image_data_uri(o.company_id.logo)" width="170px" height="110px"/>
+                        </div>
+                        <div class="col-8">
+                            <style>
+                                .judul{
+                                    font-size: 20px;
+                                    font-weight: 900;
+                                    text-align: center;
+                                }
+                                .icon{
+                                    color:#3363c1;
+                                    padding-right: 5px;
+                                    margin-top: 1px;
+                                }
+                            </style>
+                            <div class="alamat row" style="font-size: 14px; text-align: left; padding-top: 10px;">
+                                <div class="col-1" style="text-align: right; padding-right: 5px;">
+                                    <span class="fa fa-map-marker" style="font-size:25px; color:#3363c1;"/>
+                                </div>
+                                <div class="col-11">
+                                    <span t-esc="o.company_id.street"/>
+                                    <span t-if="o.company_id.street and o.company_id.street2">, </span>
+                                    <span t-esc="o.company_id.street2"/>
+                                    <span t-if="o.company_id.street2 and o.company_id.city">, </span>
+                                    <span t-esc="o.company_id.city"/>
+                                    <span t-if="o.company_id.city and o.company_id.state_id">, </span>
+                                    <span t-esc="o.company_id.state_id.name"/>
+                                    <span t-esc="o.company_id.zip"/>
+                                </div>
+                            </div>
+                            <div class="row" style="font-size: 14px; text-align: left; padding-top: 5px;">
+                                <div class="col-1" style="text-align: right;">
+                                    <span class="fa fa-phone icon" style="font-size:22px;"></span>
+                                </div>
+                                <div class="col-5">
+                                    <span t-esc="o.company_id.mobile"/>
+                                </div>
+                                <div class="col-1" style="text-align: right;">
+                                    <span class="fa fa-envelope icon" style="font-size:20px;"></span>
+                                </div>
+                                <div class="col-5">
+                                    <span t-esc="o.company_id.email"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1" style="display: flex; margin-top: 15px; align-item:right;vertical-align: right; text-align:right;">
+                        </div>
+                    </div>
+                </div>
+                <div class="page">
+                    <div style="margin-top: 10px; padding: 5px 0; border-top: 2px solid black;">
+                    </div>
+                    <div class="row" style="font-size: 13px;">
+                        <div class="col-9">
+                            <table class="table-borderless" style="width: 100%;">
+                                <tr>
+                                    <td style="width: 15%;">Nomor</td>
+                                    <td style="width: 3%">:</td>
+                                    <td style="width: 82%"><span t-esc="o.name"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Lampiran</td>
+                                    <td>-</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Perihal</td>
+                                    <td>:</td>
+                                    <td>Harga Penawaran Produk</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-3">
+                            <div class="tanggal" style="text-align: right;">
+                                <span t-field="o.date_order" t-options='{"widget": "date", "format": "dd MMMM yyyy"}'/>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; padding-top: 20px;">
+                        <span>Kepada Yth,</span>
+                        <div style="font-weight: 800; padding-top: 3px;">
+                            <span t-esc="o.partner_id.name"/>
+                        </div>
+                        <div style="font-weight: 800; padding-top: 0px;">
+                            <span t-esc="o.partner_id.parent_id.name"/>
+                        </div>
+                        <div style="font-size: 13px; padding-top: 3px;">
+                            <span t-esc="o.partner_id.street"/>
+                            <span t-if="o.partner_id.street and o.partner_id.city">, </span>
+                            <span t-esc="o.partner_id.city"/>
+                            <span t-if="o.partner_id.city and o.partner_id.state_id">, </span>
+                            <span t-esc="o.partner_id.state_id.name"/>
+                            <span t-if="o.partner_id.state_id and o.partner_id.zip">, </span>
+                            <span t-esc="o.partner_id.zip"/>
+                        </div>
+                        <div style="padding-top: 20px; padding-bottom: 5px;">
+                            Dengan Hormat,
+                        </div>
+                        <div>
+                            Bersama ini kami menawarkan Evaporation Boats kepada <span t-esc="o.partner_id.parent_id.name"/>
+                        </div>
+                        <div style="padding-top:20px;">
+                            Berikut adalah detail penawaran kami:
+                        </div>
+                    </div>
+                    <div class="detail" style="padding-top: 10px;">
+                        <style>
+                            .table-atas td{
+                                padding: 3px 5px 1px 5px;
+                                border-right: 1px solid black;
+                            }
+                            .table-atas th{
+                                padding: 3px 2px 3px 5px; 
+                                border-bottom: 1px solid black;
+                                border-right: 1px solid black;
+                                color: white;
+                            }
+                        </style>
+                        <table class="table-atas table-borderless" style="width:100%; padding-top: 15px; border: 1px solid black;">
+                            <thead>
+                                <tr style="background-color: #3363c1;">
+                                    <th>No.</th>
+                                    <th>Nama Barang</th>
+                                    <th>Qty</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Jumlah</th>
+                                </tr>
+                            </thead>
+                            <t t-set="harga_barang" t-value="0"/>
+                            <t t-set="total_discount" t-value="0"/>
+                            <t t-set="invoice_lines" t-value="o.order_line.filtered(lambda l: not l.is_delivery)" />
+                            <tbody>
+                                <t t-set="no" t-value="0"/>
+                                <t t-foreach="invoice_lines" t-as="line">
+                                    <t t-set="total_discount" t-value="total_discount + line.discount * line.product_uom_qty * line.price_unit / 100"/>
+                                    <t t-set="harga_barang" t-value="line.price_unit * line.product_uom_qty"/>
+                                    <t t-set="no" t-value="no + 1"/>
+                                    <tr>
+                                        <td style="text-align: center;">
+                                            <span><t t-out="no"/>.</span>
+                                        </td>
+                                        <td style="text-align: left;">
+                                            <t t-out="line.product_id.name"/>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <t t-out="line.product_uom_qty" t-options="{'widget':'float', 'precision':2}"/>
+                                        </td>
+                                        <td style="text-align: right;">
+                                        <span t-options="{'widget':'float', 'precision':2}" t-esc="line.price_unit"/>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <span t-options="{'widget':'float', 'precision':2}" t-esc="harga_barang"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="len(invoice_lines) &lt; 5">
+                                    <t t-set="empty_lines" t-value="5 - len(invoice_lines)"/>
+                                    <t t-foreach="range(empty_lines)" t-as="line">
+                                        <tr>
+                                            <td style="text-align: left; border-right: 1px solid black;"><br /></td>
+                                            <td style="text-align: left; border-right: 1px solid black;"><br /></td>
+                                            <td style="text-align: center; border-right: 1px solid black;"><br /></td>
+                                            <td style="text-align: right; border-right: 1px solid black;"><br /></td>
+                                            <td style="text-align: right;"><br /></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bawah">
+                        <style>
+                            .border-table-wrapper { border: 1px solid black; border-radius: 10px; padding: 5px;}
+                        </style>
+                        <div class="row" style="padding-top: 5px; page-break-inside: avoid;">
+                            <div class="col-8" width="100%;">
+                                <div style="width: 100%; padding-top: 3px; font-size: 13px;">
+                                    <div style="min-height: 100px;">
+                                        <span style="font-weight: 900; font-size: 15px;">Notes:</span> : <span t-field="o.note"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4" style="margin-left: 5px;">
+                                <style>
+                                    .table-borderless th, .table-borderless td {
+                                        padding: 3px 2px 3px 3px;
+                                        font-size: 13px;
+                                    }
+                                </style>
+                                <table class="table-borderless" style="width:100%;">
+                                    <t t-set="ongkos_kirim" t-value="sum(o.order_line.filtered(lambda l: l.product_id == o.company_id.shipping_product_id).mapped('price_subtotal'))"/>
+                                    <t t-set="total_before_ongkos_kirim" t-value="o.amount_untaxed - ongkos_kirim"/>
+                                    <tr>
+                                        <th style="text-align: right;">Sub. Total</th>
+                                        <td style="text-align: right;">
+                                            <span t-options="{'widget':'float', 'precision':2}" t-esc="total_before_ongkos_kirim"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: right;">PPN</th>
+                                        <td style="text-align: right;"><span t-options="{'widget':'float', 'precision':2}" t-esc="o.amount_tax"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: right;">Total</th>
+                                        <td style="text-align: right;">
+                                            <span t-options="{'widget':'float', 'precision':2}" t-esc="o.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div style="padding-top: 20px; font-size: 13px;">
+                            Demikianlah Surat Penawaran Harga ini kami sampaikan. Atas perhatian dan kerjasamanya kami ucapkan terimakasih.
+                        </div>
+                    </div>
+                    <div class="divnote" style="padding-top: 20px; page-break-inside: avoid;">
+                        <div class="row">
+                            <div class="col-3" style="text-align: center;">
+                                <div>
+                                    <span style=" font-size: 14px; font-weight: 900;">
+                                        Hormat Kami,
+                                    </span>
+                                </div>
+                                <div style="padding-top: 130px; font-size: 13px; text-align: center;">
+                                    ___________________________________
+                                </div>
+                                <div style="font-size: 14px; text-align: center; padding-top: 3px; font-weight: 900;">
+                                    <span>Erwin</span><br/>
+                                    <span>PT. Win Berkat Abadi</span>
+                                    <!-- <t t-out="o.disetujui_oleh.name"/> <br/>
+                                    <t t-if="o.disetujui_oleh.function">
+                                        <span t-out="o.disetujui_oleh.function"/>
+                                    </t> -->
+                                </div>
+                            </div>
+                            <div class="col-9">
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

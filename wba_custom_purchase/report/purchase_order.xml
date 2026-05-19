@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_a4_purchase_order" model="report.paperformat">
+        <field name="name">Paperformat A4 Purchase Order Report</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="orientation">Portrait</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">20</field> 
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="purchase_order_report" model="ir.actions.report">
+        <field name="name">Purchase Order Ttd</field> 
+        <field name="model">purchase.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">wba_custom_purchase.report_purchase_order</field>
+        <field name="report_file">wba_custom_purchase.report_purchase_order</field>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="print_report_name">("Purchase Order Report - %s" % (object.name))</field>
+        <field name="paperformat_id" ref="paperformat_a4_purchase_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_purchase_order">
+        <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <style>
+                            .table-judul{
+                                border: 1px solid black;
+                            }
+                            .table-judul td{
+                                padding: 5px;
+                                border: 1px solid black;
+                            }
+
+                            .div-from-left{
+                                border-left: 1px solid black; 
+                                border-top: 1px solid black;
+                                border-bottom: 1px solid black;
+                                min-height: 100px; 
+                                padding: 5px;
+                            }
+                            .div-from{
+                                border: 1px solid black; 
+                                min-height: 100px; 
+                                padding: 5px;
+                            }
+                            .font-size13 {
+                                font-size: 13px;
+                            }
+                            .table-produk{
+                                width: 100%;
+                                padding: 4px;
+                            }
+                            .table-produk td, th{
+                                padding: 4px;
+                            }
+                        </style>
+                        <div class="header">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div>
+                                        <img t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 80px; max-width: 130px;"/>
+                                    </div>
+                                </div>
+                                <div class="col-6" style="text-align:right; font-size: 24px; font-weight: bold;">
+                                    <span>PURCHASE ORDER</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <table style="width: 40%;" class="table-borderless table-judul">
+                                <tr>
+                                    <td style="font-weight: bold; font-size: 13px;">PO Number</td>
+                                    <td style="font-weight: bold; font-size: 13px;">PO Date</td>
+                                </tr>
+                                <tr class="font-size13">
+                                    <td>
+                                        <span t-out="o.name"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="o.date_order" t-options='{"widget": "date", "format": "yyyy-MM-dd"}'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div style="padding-top: 10px;" class="font-size13">
+                            <div class="row">
+                                <div class="col-6 div-from-left">
+                                    <div><strong>TO :</strong></div>
+                                    <div><strong t-out="o.partner_id.name"/></div>
+                                    <div t-if="o.partner_id.street"><span t-out="o.partner_id.street"/></div>
+                                    <div t-if="o.partner_id.city"><span t-out="o.partner_id.city"/></div>
+                                    <div t-if="o.partner_id.zip"><span t-out="o.partner_id.zip"/></div>
+                                    <div t-if="o.partner_id.country_id.name"><span t-out="o.partner_id.country_id.name"/></div>
+                                    <div t-if="o.partner_id.phone"><span t-out="o.partner_id.phone"/></div>
+                                </div>
+                                <div class="col-6 div-from">
+                                    <div><strong>FROM :</strong></div>
+                                    <div><strong t-out="o.company_id.name"/></div>
+                                    <div t-if="o.company_id.street"><span t-out="o.company_id.street"/></div>
+                                    <div t-if="o.company_id.city"><span t-out="o.company_id.city"/></div>
+                                    <div t-if="o.company_id.zip"><span t-out="o.company_id.zip"/></div>
+                                    <div t-if="o.company_id.phone"><span t-out="o.company_id.phone"/></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding-top: 10px;" class="font-size13">
+                            <table class="table-bordered table-produk" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Uom</th>
+                                        <th>Unit Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="no" t-value="0"/>
+                                    <t t-set="total_discount" t-value="0"/>
+                                    <t t-set="order_line" t-value="o.order_line.filtered(lambda l: not l.is_delivery)"/>
+                                    <t t-foreach="order_line" t-as="line">
+                                        <t t-set="total_discount" t-value="total_discount + line.discount * line.product_qty * line.price_unit / 100"/>
+                                        <t t-if="not line.display_type">
+                                            <t t-set="no" t-value="no + 1"/>
+                                            <tr>
+                                                <td style="text-align: center;"><span t-out="no"/></td>
+                                                <td><span t-out="line.product_id.name"/></td>
+                                                <td style="text-align: right;"><span t-out="line.product_qty" t-options="{'widget':'float', 'precision':2}"/></td>
+                                                <td style="text-align: center;"><span t-out="line.product_uom.name"/></td>
+                                                <td style="text-align: right;"><span t-options="{'widget':'float', 'precision':2}" t-out="line.price_unit"/></td>
+                                                <td style="text-align: right;"><span t-options="{'widget':'float', 'precision':2}" t-out="line.price_subtotal"/></td>
+                                            </tr>
+                                        </t>
+                                        <t t-elif="line.display_type == 'line_section'">
+                                            <tr>
+                                                <td style="text-align: center;"></td>
+                                                <td colspan="4" style="font-weight: bold; background-color: #eee;">
+                                                    <span t-out="line.name"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <t t-elif="line.display_type == 'line_note'">
+                                            <tr>
+                                                <td colspan="4" style="font-style: italic;">
+                                                    <span t-out="line.name"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <t t-if="len(o.order_line) &lt; 25">
+                                        <t t-set="empty_lines" t-value="25 - len(o.order_line)"/>
+                                        <t t-foreach="range(empty_lines)" t-as="i">
+                                            <tr>
+                                                <td style="height: 15px; "></td>
+                                                <td style="height: 15px; "></td>
+                                                <td style="height: 15px; "></td>
+                                                <td style="height: 15px; text-align: center;"></td>
+                                                <td style="height: 15px; text-align: right;"></td>
+                                                <td style="height: 15px; text-align: right;"></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="page-break-inside: avoid;">
+                            <div class="row font-size13">
+                                <div class="col-6">
+                                    <div>
+                                        <span t-if="o.notes"><span t-out="o.notes"/></span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <table class="table-borderless" width="100%" style="border-collapse: collapse;">
+                                        <t t-set="ongkos_kirim" t-value="sum(o.order_line.filtered(lambda l: l.product_id == o.company_id.shipping_product_id).mapped('price_subtotal'))"/>
+                                        <t t-set="total_before_ongkos_kirim" t-value="o.amount_untaxed - ongkos_kirim"/>
+                                        <t t-set="dpp" t-value="0"/>
+                                        <t t-set="tax_name" t-value="o.order_line and o.order_line[0].taxes_id and o.order_line[0].taxes_id[0].name or ''"/>
+
+                                        <t t-if="'12%' in tax_name">
+                                            <t t-set="dpp" t-value="(o.amount_untaxed - total_discount) * 11 / 12"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-set="dpp" t-value="o.amount_untaxed - total_discount"/>
+                                        </t>
+                                        <tbody>
+                                            <t t-if="o.discount_global_amount">
+                                                <tr>
+                                                    <td style="text-align: right; padding-bottom: 4px;"><strong>Total Before Disc:</strong></td>
+                                                    <td style="text-align: right; padding-bottom: 4px;"><span t-options="{'widget':'float', 'precision':2}" t-out="o.amount_total_before_discount_global"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align: right; padding-bottom: 4px;"><strong>Discount:</strong></td>
+                                                    <td style="text-align: right; padding-bottom: 4px;"><span t-options="{'widget':'float', 'precision':2}" t-out="o.discount_global_amount"/></td>
+                                                </tr>
+                                            </t>
+                                            <tr>
+                                                <td style="text-align: right; padding-bottom: 4px;"><strong>Total Before VAT:</strong></td>
+                                                <td style="text-align: right; padding-bottom: 4px;"><span t-options="{'widget':'float', 'precision':2}" t-out="total_before_ongkos_kirim"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right; padding-bottom: 4px;"><strong>Delivery Cost:</strong></td>
+                                                <td style="text-align: right; padding-bottom: 4px;"><span t-options="{'widget':'float', 'precision':2}" t-out="ongkos_kirim"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right; padding-bottom: 4px;"><strong>Dasar Pengenaan Pajak:</strong></td>
+                                                <td style="text-align: right; padding-bottom: 4px;"><span t-options="{'widget':'float', 'precision':2}" t-out="dpp"/></td>
+                                            </tr>
+                                            <tr> 
+                                                <td style="text-align: right; padding-bottom: 4px;"><strong>VAT:</strong></td>
+                                                <td style="text-align: right; padding-bottom: 4px;"><span t-options="{'widget':'float', 'precision':2}" t-out="o.amount_tax"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="text-align: right; padding-bottom: 4px;"><strong>Total Incl VAT:</strong></td>
+                                                <td style="text-align: right;"><span t-options="{'widget':'float', 'precision':2}" t-out="o.amount_total"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding-top: 10px; page-break-inside: avoid;">
+                            <div class="row font-size13">
+                                <div class="col-4" style="text-align: center;">
+                                    <div style="padding-bottom: 60px;">
+                                        <span>Dibuat Oleh,</span>
+                                    </div>
+                                    <div style="font-weight: bold;">
+                                        <span t-out="o.company_id.name"/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                </div>
+                                <div class="col-4" style="text-align: center;">
+                                    <div style="padding-bottom: 60px;">
+                                        <span>Disetujui Oleh,</span>
+                                    </div>
+                                    <div style="font-weight: bold;">
+                                        <span t-out="o.disetujui_oleh"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="footer font-size12">
+                            <style>
+                                .font-size12 {
+                                    font-size: 13px;
+                                }
+                            </style>
+                            <div width="100%" style="border-top: 1px solid black;">
+                                <div>
+                                    <strong>
+                                        <span t-out="o.company_id.name"/>
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span t-out="o.company_id.street or ''"/>,
+                                    <span t-out="o.company_id.city or ''"/>,
+                                    <span t-out="o.company_id.zip or ''"/>,
+                                    <span t-out="o.company_id.country_id.name or ''"/>
+                                </div>
+                                <div>
+                                    <span t-out="o.company_id.phone or ''"/>,
+                                    <span t-out="o.company_id.email or ''"/>
+                                    <span t-out="o.company_id.website or ''"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

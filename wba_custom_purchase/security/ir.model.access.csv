@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_order_category_user,wba_custom_purchase.purchase.order.category,model_purchase_order_category,base.group_user,1,1,1,1
+access_choose_delivery_carrier_purchase_user,wba_custom_purchase.choose.delivery.carrier.purchase,model_choose_delivery_carrier_purchase,base.group_user,1,1,1,1

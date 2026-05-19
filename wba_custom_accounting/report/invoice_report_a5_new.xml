@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_A5_invoice" model="report.paperformat">
+        <field name="name">Paperformat A5</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="orientation">Portrait</field>
+        <field name="page_height">140</field>
+        <field name="page_width">210</field>
+        <field name="margin_top">45</field>
+        <field name="margin_bottom">25</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field> 
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_faktur_penjualan_new" model="ir.actions.report">
+        <field name="name">Invoices / Vendor Bill A5</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">wba_custom_accounting.faktur_penjualan_report</field>
+        <field name="report_file">wba_custom_accounting.faktur_penjualan_report</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="print_report_name">('Invoice - %s' % (object.name))</field>
+        <field name="paperformat_id" ref="paperformat_A5_invoice"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+    <template id="faktur_penjualan_report" >
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="header">
+                        <style>
+                            h4 {
+                                font-size : 17px;
+                            }
+                            body {
+                                font-size: 14px;
+                            }
+                            .left-header img {
+                                width: 40px;
+                            }
+                        </style>
+                        <div class="col-6 left-header">
+                            <t t-if="o.company_id">
+                                <t t-if="o.company_id.logo">
+                                    <img t-att-src="image_data_uri(o.company_id.logo)" alt="Company Logo"/>
+                                </t>
+                            </t>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <h4 style="font-weight:bold;" t-field="o.company_id"/>
+                                <p class="mb-0 mt-0">
+                                    No. Hp : <span t-field="o.company_id.mobile"/>
+                                </p>
+                                <p class="mb-0 mt-0">
+                                    Tel/Tax : <span t-field="o.company_id.phone"/>
+                                </p>
+                                 <p class="mb-0 mt-0">
+                                    Salesman : <span t-field="o.invoice_user_id"/>
+                                </p>
+                                <p class="mt-0 mb-0">
+                                    Jatuh Tempo: <span t-out="o.invoice_date_due"/>
+                                </p>
+                                <p class="mb-0 mt-0">
+                                    No. Faktur : <span t-field="o.name"/>
+                                </p>
+                            </div>
+                            <div class="col-4">
+                                <h4 style="font-weight:bold;" class="text-center">
+                                    <t t-if="o.move_type == 'out_invoice'">
+                                        FAKTUR PENJUALAN
+                                    </t>
+                                    <t t-elif="o.move_type == 'in_invoice'">
+                                        FAKTUR PEMBELIAN
+                                    </t>
+                                </h4>
+                            </div>
+                            <div class="col-4">
+                                <p class="mt-0 mb-0">
+                                    <span t-out="o.company_id.city"/>, <span t-if="o.invoice_date" t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd MMMM yyyy"}'/>
+                                </p>
+                                <p class="mt-0 mb-0">
+                                    Kepada Yth:
+                                </p>
+                                <p class="mt-0 mb-0" style="font-size: 17px !important;">
+                                    <strong t-field="o.partner_id.name"/> (<span t-out="o.partner_id.company_registry"/>)
+                                </p>
+                                <p t-if="o.partner_id.street" t-field="o.partner_id.street" class="mt-0 mb-0" />
+                                <p class="mt-0 mb-0">
+                                    <strong t-field="o.partner_id.city"/>
+                                </p>
+                            </div>
+                        </div>
+                        <br/>
+                    </div>
+                    <div class="page">
+                        <style>
+                            body {
+                                font-size: 14px;
+                            }
+
+                            .no-padding tr td{
+                                padding: 0px !important;
+                            }
+                            .no-padding tr th{
+                                padding: 0px !important;
+                            }
+
+                            .table-bordered tr td{
+                                border: 1px solid black;
+                                vertical-align: middle;
+                            }
+
+                            .no-padding tr span{
+                                padding: 0px !important;
+                            }
+
+                            
+                            .table-bordered tr th{
+                                border: 1px solid black;
+                            }
+                        </style>
+                        <t t-set="price_subtotal" t-value="0"/>
+                        <t t-set="line_discount" t-value="o.invoice_line_ids.filtered(lambda x: x.product_id == o.company_id.sale_discount_product_id)" />
+                        <br />
+                        <br/>
+                        <t t-set="table_header">
+                            <table  class="table table-bordered no_padding mt-0 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="padding:5px 2px;" width="5%">
+                                            No.
+                                        </th>
+                                        <th style="padding:5px 2px;" width="45%">
+                                            Nama Barang
+                                        </th>
+                                        <th style="padding:5px 2px;" width="7%">
+                                            Qty
+                                        </th>
+                                        <th style="padding:5px 2px;" width="9%">
+                                            Satuan
+                                        </th>
+                                        <th style="padding:5px 2px;" width="13%">
+                                            Harga
+                                        </th>
+                                        <th style="padding:5px 2px;" width="7%">
+                                            Pot.
+                                        </th>
+                                        <th style="padding:5px 2px;">
+                                            Jumlah
+                                        </th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </t>
+                        <t t-esc="table_header" />
+                        <t t-set="invoice_lines" t-value="o.invoice_line_ids.filtered(lambda x: x.product_id != o.company_id.sale_discount_product_id or not x.product_id)" />
+                        <t t-foreach="invoice_lines" t-as="line">
+                             <table class="table table-bordered no_padding mt-0 mb-0" style="font-size: 16px;">
+                            
+                                    <tbody>
+                                            <tr>
+                                                <td style="padding:0 5px !important;" class="text-center" width="5%">
+                                                    <span t-esc="line_index + 1"/>
+                                                </td>
+                                                <td style="padding:0 5px !important;" width="45%">
+                                                    <span t-field="line.product_id.name" t-if="line.product_id"/> <span t-field="line.name" t-if="not line.product_id"/>
+                                                </td>
+                                                <td style="padding:0 5px !important;" class="text-center" width="7%">
+                                                    <span t-esc="line.quantity"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(line.quantity)}"/>
+                                                </td>
+                                                 <td style="padding:0 5px !important;" class="text-end" width="9%">
+
+                                                    <span t-field="line.product_uom_id.name"/>
+                                                </td>
+                                                <td style="padding:0 5px !important;" class="text-end" width="13%">
+                                                    <span t-esc="line.price_unit"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(line.price_unit)}"/>
+
+                                                </td>
+                                                <td style="padding:0 5px !important;" class="text-end" width="7%">
+                                                    <span t-esc="line.discount"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(line.discount)}"/>
+
+                                                    <span>
+                                                        %
+                                                    </span>
+                                                </td>
+                                                <td style="padding:0 5px !important;" class="text-end">
+                                                    <span t-esc="line.price_subtotal"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(line.price_subtotal)}"/>
+
+                                                </td>
+                                                <t t-set="price_subtotal" t-value="price_subtotal + line.price_subtotal"/>
+                                            </tr>
+                                    </tbody>
+                            </table>
+                            
+                            <t t-if="(line_index + 1) % 4 == 0 and line != invoice_lines[-1] ">
+                                <p style="page-break-before: always;"></p>
+                                <br />
+                                <br />
+                                <t t-esc="table_header" />
+                            </t>
+                        </t>
+                        <br/>
+                        <div class="row no_padding mt-0 mb-0">
+                            <div class="col-9" style="font-size: 16px;">
+                                <p t-esc="o._num_2_words(o.amount_total_signed)" />
+                            </div>
+                            <div class="col-3">
+                                <table  class="table table-borderless no-padding" style="line-height: 1; font-size: 13px;">
+                                    <tr>
+                                        <td class="text-end" width="35%">
+                                            Subtotal
+                                        </td>
+                                        <td class="text-start">
+                                            :
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-esc="price_subtotal"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(price_subtotal)}"/>
+
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td class="text-end" width="35%">
+                                                
+                                                <span>
+                                                Pot 
+                                                </span>  
+                                            <strong>
+                                                    <span t-field="o.discount_global_percentage"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(o.discount_global_percentage)}"/> %
+                                            </strong>
+                                        </td>
+                                        <td class="text-start">
+                                            :
+                                        </td>
+                                        <td class="text-end">
+                                            
+                                           <span t-field="o.discount_global_amount"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(o.discount_global_amount)}"/>
+
+
+                                        </td>
+                                    </tr>
+                                    <tr class="text-end" t-if="o.amount_tax" >
+                                        <td width="35%">
+                                            PPN
+                                        </td>
+                                        <td class="text-start">
+                                            :
+                                        </td>
+                                        <td>
+                                            <span t-esc="o.amount_tax"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(o.amount_tax)}"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="text-end" style="font-size:14px;">
+                                        <td width="35%" > 
+                                            <span>
+                                                Total
+                                            </span>
+                                        </td>
+                                        <td class="text-start">
+                                            <span>
+                                            
+                                                :
+                                            </span>
+                                        </td>
+                                        <td style="font-weight:bold; font-size: 17px !important;">
+                                           <span>Rp. </span> <span t-field="o.amount_total"  t-options="{'widget': 'float' , 'precision': o.count_decimal_places(o.amount_total)}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+                            
+                                <!-- <div t-field="o.narration" /> -->
+                            </div>
+                            <div class="col-4 mt-3">
+                                <p class="text-end">
+                                    Dicetak Oleh <span t-esc="env.user.name"/>, Pukul <span t-esc="(datetime.datetime.now() + datetime.timedelta(hours=7)).strftime('%d %B %Y %H:%M:%S')"/>
+                                </p>
+
+                            </div>
+                        </div>
+                    
+                    </div>
+                    <div class="footer">
+                        <style>
+                            body {
+                                font-size: 13px;
+                            }
+                        </style>
+                        <div t-field="o.narration" class="last-page"/>
+                        <div class="row" >
+                            <div class="col-6">
+                                Halaman : <span class="page"/> dari <span class="topage"/>
+                            </div>
+                            <div class="col-3 last-page">
+                                <p class="text-center">
+                                    Penerima,
+                                </p>
+                            </div>
+                            <div class="col-3 last-page">
+                                <p class="text-center">
+                                    Hormat Kami,
+                                </p>
+                            </div>
+                        
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_wizard_dti_stock_balance_report_user,stock_card_balance.wizard.dti.stock.balance.report,model_wizard_dti_stock_balance_report,,1,1,1,1
+access_wizard_dti_stock_card_report_user,stock_card_balance.wizard.dti.stock.card.report,model_wizard_dti_stock_card_report,,1,1,1,1

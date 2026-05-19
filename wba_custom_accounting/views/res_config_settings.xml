@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inherit_res_config_settings_account" model="ir.ui.view">
+        <field name="name">res.config.settings.inherit.account</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <app name="account" position="inside">
+                <block title="Shipping Product" name="shipping_product_container">
+                    <setting string="Shipping Product" help="Select the shipping product to be used in the system" name="shipping_product_id">
+                        <field name="shipping_product_id"/>
+                    </setting>
+                </block>
+            </app>
+        </field>
+    </record>
+
+</odoo>

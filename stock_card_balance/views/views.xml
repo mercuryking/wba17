@@ -1,0 +1,6 @@
+<odoo>
+   <menuitem id="menu_dti_stock_card_report" name="Stock Card Report"
+        parent="stock.menu_warehouse_report" action="action_wizard_dti_stock_card_report" sequence="1"/>
+    <!-- <menuitem id="menu_dti_stock_balance_report" name="Stock Balance Report"
+        parent="stock.menu_warehouse_report" action="action_wizard_dti_stock_balance_report" sequence="2"/> -->
+</odoo>

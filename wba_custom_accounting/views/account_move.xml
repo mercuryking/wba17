@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inherit_account_move_form_view" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.wba_custom_accounting</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <group id="header_right_group" position="inside">
+                <field name="available_picking_ids" invisible="1" />
+                <field name="picking_ids" invisible="'out_' not in move_type" readonly="state !='draft'" domain="[('id', 'in', available_picking_ids)]" widget="many2many_tags" options="{'no_create': True}" />
+                <field name="picking_ids" invisible="'in_' not in move_type" string="Receiving Number" readonly="state !='draft'" domain="[('id', 'in', available_picking_ids)]" widget="many2many_tags" options="{'no_create': True}" />
+            </group>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">sale_line_ids or purchase_line_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='price_unit']" position="after">
+                <field name="sale_line_ids" column_invisible="1" />
+                <field name="purchase_line_id" column_invisible="1" />
+            </xpath>
+            <page id="other_tab" position="after">
+                <page string="Customer Signature">
+                    <group>
+                        <field name="disetujui_oleh" readonly="state != 'draft'"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <record id="account_move_view_tree_inherit" model="ir.ui.view">
+        <field name="name">account.move.view.tree.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="currency_id" position="after">
+                <field name="picking_ids" widget="many2many_tags" optional="show" options="{'no_create': True}" />
+            </field>
+            
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_valuation_cost_recalc"
+              name="Cost Recalculation"
+              parent="stock.menu_warehouse_report"
+              action="action_cost_recalc_wizard_product"
+              sequence="150"/>
+</odoo>

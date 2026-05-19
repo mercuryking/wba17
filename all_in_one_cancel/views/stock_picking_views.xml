@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_inherit_cancel" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.cancel</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_force_reset_draft" string="Reset to Draft" type="object" 
+                        invisible="state == 'draft'" 
+                        groups="base.group_system"
+                        confirm="This will reset the picking and valuation. Are you sure?"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

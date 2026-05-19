@@ -1,0 +1,43 @@
+<?xml version ="1.0" encoding="utf-8" ?>
+
+<odoo>
+    <record id="sh_sale_config_cancel_form_inherit" model="ir.ui.view">
+        <field name="name">sale.config.cancel.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='sale_management']//div[1]" position="after">
+                <h2>Sale Order Cancel Configuration</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane">
+                            <label for="operation_type" />
+                            <div class="mt8">
+                                <field name="operation_type" widget="radio" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="cancel_delivery" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="cancel_delivery" />
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="cancel_invoice" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="cancel_invoice" />
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

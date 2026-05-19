@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="wizard_dti_stock_balance_report_form" model="ir.ui.view">
+        <field name="name">wizard.dti.stock.balance.report.form</field>
+        <field name="model">wizard.dti.stock.balance.report</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="company_id" options="{'no_create': True, 'no_open': True}" required="1"/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Location &amp; Dates">
+                    	<field name="location_id" options="{'no_create': True, 'no_open': True}"/>
+                        <label for="start_date" string="Dates"/>
+                        <div class="o_row">
+                            <field name="start_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_end_date': 'end_date'}" placeholder="Start Date" required="1"/>
+                            <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="Arrow"/>
+                            <field name="end_date" widget="daterange" nolabel="1" class="oe_inline" options="{'related_start_date': 'start_date'}" placeholder="End Date" required="1"/>
+                        </div>
+                    </group>
+                </group>
+                <group>
+                    <field name="product_ids" domain="[('active','=',True),('type','=','product')]" string="Products (Optional)" options="{'no_create': True, 'no_open': True}">
+                        <tree>
+                            <field name="default_code"/>
+                            <field name="name"/>
+                            <field name="uom_id"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="button_print_excel" string="Download Excel" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_wizard_dti_stock_balance_report">
+        <field name="name">Stock Balance Report</field>
+        <field name="res_model">wizard.dti.stock.balance.report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="wizard_dti_stock_balance_report_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
